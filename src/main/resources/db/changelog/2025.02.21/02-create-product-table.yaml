@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025.02.21_02
+      author: vvsslova@mail.ru
+      changes:
+        - createTable:
+            schemaName: asset_spy_products_service_db
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar (200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar (200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: manufacturer
+                  type: varchar (200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: decimal (10,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: vendor_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: product
+            baseColumnNames: vendor_id
+            constraintName: FK_vendor_id
+            referencedTableName: vendor
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT

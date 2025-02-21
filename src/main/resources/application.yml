@@ -14,3 +14,6 @@ spring:
       hibernate:
         default_schema: asset_spy_products_service_db
         format_sql: true
+  liquibase:
+    enabled: true
+    default-schema: asset_spy_products_service_db
