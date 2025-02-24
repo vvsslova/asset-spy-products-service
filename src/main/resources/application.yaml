@@ -17,3 +17,4 @@ spring:
   liquibase:
     enabled: true
     default-schema: asset_spy_products_service_db
+hasher_password: 8724067958093891
