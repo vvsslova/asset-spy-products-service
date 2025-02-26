@@ -1,8 +1,10 @@
 package asset.spy.products.service.services;
 
-import asset.spy.products.service.dto.ProductDTO;
-import asset.spy.products.service.entity.Product;
-import asset.spy.products.service.entity.Vendor;
+import asset.spy.products.service.dto.ResponseProductDto;
+import asset.spy.products.service.dto.SaveProductDto;
+import asset.spy.products.service.dto.UpdateProductDto;
+import asset.spy.products.service.entity.ProductEntity;
+import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.mapper.ProductMapper;
 import asset.spy.products.service.repositories.ProductRepository;
 import asset.spy.products.service.repositories.VendorRepository;
@@ -10,11 +12,13 @@ import asset.spy.products.service.util.hashing.IDHasher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,91 +29,88 @@ public class ProductService {
     private final VendorRepository vendorRepository;
     private final ProductMapper productMapper;
 
-    public List<ProductDTO> getProducts(int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<ResponseProductDto> getProducts(int page, int size, String sortCriteria) {
+
         log.info("Get products from page {} of size {}", page, size);
 
         return productRepository
-                .findAll(PageRequest.of(page, size))
-                .getContent()
-                .stream()
-                .map(productMapper::toProductDTO)
-                .collect(Collectors.toList());
+                .findAll(PageRequest.of(page, size, Sort.by(sortCriteria)))
+                .map(productMapper::toResponseProductDto);
     }
 
-    public ProductDTO getProduct(long id) {
-        log.info("Get product with id {}", id);
+    @Transactional(readOnly = true)
+    public ResponseProductDto getProduct(long id) {
+        log.info("Start getting product with id {}", id);
 
-        Product product = productRepository
-                .findById(IDHasher.hashId(id))
-                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        ProductEntity product = findProductById(id);
 
-        return productMapper.toProductDTO(product);
+        return productMapper.toResponseProductDto(product);
     }
 
-    public ProductDTO saveProduct(ProductDTO product, long vendorId) {
+    @Transactional
+    public ResponseProductDto saveProduct(SaveProductDto product, long vendorId) {
         log.info("Received product to save : {}", product);
 
-        Vendor vendor = vendorRepository
-                .findById(IDHasher.hashId(vendorId))
-                .orElseThrow(() -> new EntityNotFoundException("Vendor not found"));
+        VendorEntity vendor = findVendorById(vendorId);
         log.info("Founded vendor to save : {}", vendor);
 
-        Product productToSave = Product.builder()
-                .name(product.getName())
-                .type(product.getType())
-                .manufacturer(product.getManufacturer())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .vendor(vendor)
-                .build();
+        ProductEntity productToSave = productMapper.toProduct(product);
+        productToSave.setVendor(vendor);
         log.info("Product to save : {}", productToSave);
 
         productRepository.save(productToSave);
-        return productMapper.toProductDTO(productToSave);
+        return productMapper.toResponseProductDto(productToSave);
     }
 
-    public ProductDTO updateProduct(ProductDTO product) {
-        log.info("Received product to update : {}", product);
+    @Transactional
+    public ResponseProductDto updateProduct(UpdateProductDto productDto) {
+        log.info("Received product to update : {}", productDto);
 
-        Product productToUpdate = productRepository
-                .findById(IDHasher.hashId(product.getId()))
-                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        ProductEntity productToUpdate = findProductById(productDto.getId());
 
-        productToUpdate.setName(product.getName());
-        productToUpdate.setType(product.getType());
-        productToUpdate.setManufacturer(product.getManufacturer());
-        productToUpdate.setDescription(product.getDescription());
-        productToUpdate.setPrice(product.getPrice());
+        productMapper.updateProduct(productToUpdate, productDto);
         log.info("Product to update : {}", productToUpdate);
 
-        return productMapper.toProductDTO(productToUpdate);
+        return productMapper.toResponseProductDto(productToUpdate);
     }
 
-    public String deleteProduct(long id) {
+    @Transactional
+    public ResponseProductDto deleteProduct(long id) {
         log.info("Received id to delete : {}", id);
 
-        Optional<Product> productToDelete = productRepository.findById(IDHasher.hashId(id));
-        if (productToDelete.isEmpty()) {
-            throw new EntityNotFoundException("Product with id " + id + "not found");
-        }
+        ProductEntity product = findProductById(id);
 
-        productRepository.deleteById(id);
+        productRepository.delete(product);
         log.info("Product with id {} was deleted", id);
-        return "Product with id " + id + " deleted";
+        return productMapper.toResponseProductDto(product);
     }
 
-    public List<ProductDTO> getProductsByVendorId(long id) {
+    @Transactional(readOnly = true)
+    public List<ResponseProductDto> getProductsByVendorId(long id) {
         log.info("Get products by vendor with id {}", id);
 
-        Vendor vendor = vendorRepository
-                .findById(IDHasher.hashId(id))
-                .orElseThrow(() -> new EntityNotFoundException("Vendor not found"));
+        VendorEntity vendor = findVendorById(id);
         log.info("Founded vendor to get products : {}", vendor);
 
         return vendor
                 .getProducts()
                 .stream()
-                .map(productMapper::toProductDTO)
+                .map(productMapper::toResponseProductDto)
                 .collect(Collectors.toList());
+    }
+
+    private VendorEntity findVendorById(long id) {
+        log.info("Getting vendor with id {}", id);
+        return vendorRepository
+                .findById(IDHasher.hashId(id))
+                .orElseThrow(() -> new EntityNotFoundException("Vendor not found"));
+    }
+
+    private ProductEntity findProductById(long id) {
+        log.info("Getting product with id {}", id);
+        return productRepository
+                .findById(IDHasher.hashId(id))
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 }

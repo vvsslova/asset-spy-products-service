@@ -7,11 +7,11 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class ErrorResponseDTO {
+public class ErrorResponseDto {
     private String message;
     private OffsetDateTime time;
 
-    public ErrorResponseDTO(String message) {
+    public ErrorResponseDto(String message) {
         this.message = message;
         this.time = OffsetDateTime.now();
     }

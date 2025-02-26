@@ -1,8 +1,10 @@
 package asset.spy.products.service.services;
 
-import asset.spy.products.service.dto.VendorDTO;
-import asset.spy.products.service.entity.Vendor;
-import asset.spy.products.service.exception.EntityNotSavedException;
+import asset.spy.products.service.dto.ResponseVendorDto;
+import asset.spy.products.service.dto.SaveVendorDto;
+import asset.spy.products.service.dto.UpdateVendorDto;
+import asset.spy.products.service.entity.VendorEntity;
+import asset.spy.products.service.exception.EntityAlreadyExistsException;
 import asset.spy.products.service.mapper.VendorMapper;
 import asset.spy.products.service.repositories.VendorRepository;
 import asset.spy.products.service.util.hashing.IDHasher;
@@ -10,85 +12,81 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 @AllArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
 public class VendorService {
     private final VendorRepository vendorRepository;
     private final VendorMapper vendorMapper;
 
-    public List<VendorDTO> getVendors(int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<ResponseVendorDto> getVendors(int page, int size, String sortCriteria) {
 
         log.info("Get vendors from page {} of size {}", page, size);
 
         return vendorRepository
-                .findAll(PageRequest.of(page, size))
-                .getContent()
-                .stream()
-                .map(vendorMapper::toVendorDTO)
-                .collect(Collectors.toList());
+                .findAll(PageRequest.of(page, size, Sort.by(sortCriteria)))
+                .map(vendorMapper::toResponseVendorDto);
     }
 
-    public VendorDTO getVendorById(Long id) {
-        log.info("'getVendorById' was called with id {}", id);
+    @Transactional(readOnly = true)
+    public ResponseVendorDto getVendorById(Long id) {
+        log.info("Start getting vendor with id {}", id);
 
-        Vendor vendor = vendorRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("This vendor does not exist"));
+        VendorEntity vendor = findVendorById(id);
 
-        return vendorMapper.toVendorDTO(vendor);
+        return vendorMapper.toResponseVendorDto(vendor);
     }
 
     @Transactional
-    public VendorDTO saveVendor(VendorDTO vendor) {
+    public ResponseVendorDto saveVendor(SaveVendorDto vendor) {
         log.info("Received vendor to save : {}", vendor);
 
         try {
-            Vendor vendorToSave = vendorMapper.toVendor(vendor);
+            VendorEntity vendorToSave = vendorMapper.toVendorEntity(vendor);
             log.info("Vendor to save : {}", vendorToSave);
 
-            return vendorMapper.toVendorDTO(vendorRepository.save(vendorToSave));
+            return vendorMapper.toResponseVendorDto(vendorRepository.save(vendorToSave));
         } catch (DataIntegrityViolationException e) {
             log.error("Error saving vendor", e);
-            throw new EntityNotSavedException("This vendor already exists", e.getCause());
+            throw new EntityAlreadyExistsException("This vendor already exists", e.getCause());
         }
     }
 
     @Transactional
-    public VendorDTO updateVendor(VendorDTO vendor) {
-        log.info("Received vendor to update : {}", vendor);
+    public ResponseVendorDto updateVendor(UpdateVendorDto vendorDto) {
+        log.info("Received vendor to update : {}", vendorDto);
 
-        Vendor vendorToUpdate = vendorRepository
-                .findById(IDHasher.hashId(vendor.getId()))
-                .orElseThrow(() -> new EntityNotFoundException("This vendor does not exist"));
+        VendorEntity vendor = findVendorById(vendorDto.getId());
 
-        vendorToUpdate.setName(vendor.getName());
-        vendorToUpdate.setCountry(vendor.getCountry());
-        log.info("Updating vendor : {}", vendorToUpdate);
+        vendorMapper.updateVendor(vendor, vendorDto);
 
-        return vendorMapper.toVendorDTO(vendorToUpdate);
+        log.info("Updated vendor : {}", vendor);
+        return vendorMapper.toResponseVendorDto(vendor);
     }
 
     @Transactional
-    public String deleteVendor(Long id) {
+    public ResponseVendorDto deleteVendor(Long id) {
         log.info("Received id to delete : {}", id);
 
-        Optional<Vendor> vendorToDelete = vendorRepository.findById(IDHasher.hashId(id));
-        if (vendorToDelete.isEmpty()) {
-            throw new EntityNotFoundException("This vendor does not exist");
-        }
+        VendorEntity vendor = findVendorById(id);
 
-        vendorRepository.deleteById(IDHasher.hashId(id));
+        vendorRepository.delete(vendor);
         log.info("Vendor with id {} was deleted", id);
-        return "Vendor with id " + id + " was deleted";
+
+        return vendorMapper.toResponseVendorDto(vendor);
+    }
+
+    private VendorEntity findVendorById(Long id) {
+        log.info("Getting vendor with id {}", id);
+        return vendorRepository
+                .findById(IDHasher.hashId(id))
+                .orElseThrow(() -> new EntityNotFoundException("This vendor does not exist"));
     }
 }

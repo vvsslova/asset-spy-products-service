@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Vendor {
+public class VendorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,5 +37,5 @@ public class Vendor {
     private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "vendor", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private List<Product> products;
+    private List<ProductEntity> products;
 }

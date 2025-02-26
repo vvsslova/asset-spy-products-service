@@ -1,7 +1,9 @@
 package asset.spy.products.service.mapper;
 
-import asset.spy.products.service.dto.VendorDTO;
-import asset.spy.products.service.entity.Vendor;
+import asset.spy.products.service.dto.ResponseVendorDto;
+import asset.spy.products.service.dto.SaveVendorDto;
+import asset.spy.products.service.dto.UpdateVendorDto;
+import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.util.hashing.IDHasher;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -14,11 +16,17 @@ import java.time.OffsetDateTime;
 @Mapper(componentModel = "spring")
 public interface VendorMapper {
 
-    @Mapping(source = "id", target = "id", qualifiedByName = "hashId")
-    VendorDTO toVendorDTO(Vendor vendor);
-
     @Mapping(target = "createdAt", ignore = true)
-    Vendor toVendor(VendorDTO vendorDTO);
+    @Mapping(target = "id", ignore = true)
+    VendorEntity toVendorEntity(SaveVendorDto vendorDTO);
+
+    @Mapping(source = "id", target = "id", qualifiedByName = "hashId")
+    ResponseVendorDto toResponseVendorDto(VendorEntity vendor);
+
+    default void updateVendor(VendorEntity vendor, UpdateVendorDto vendorDto) {
+        vendor.setName(vendorDto.getName() == null ? vendor.getName() : vendorDto.getName());
+        vendor.setCountry(vendorDto.getCountry() == null ? vendor.getCountry() : vendorDto.getCountry());
+    }
 
     @Named("hashId")
     default Long hashId(Long id) {
@@ -26,7 +34,7 @@ public interface VendorMapper {
     }
 
     @AfterMapping
-    default void setCreatedAt(@MappingTarget Vendor vendor) {
+    default void setCreatedAt(@MappingTarget VendorEntity vendor) {
         vendor.setCreatedAt(OffsetDateTime.now());
     }
 }
