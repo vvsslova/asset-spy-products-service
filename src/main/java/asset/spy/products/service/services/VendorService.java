@@ -83,7 +83,7 @@ public class VendorService {
         return vendorMapper.toResponseVendorDto(vendor);
     }
 
-    private VendorEntity findVendorById(Long id) {
+    public VendorEntity findVendorById(Long id) {
         log.info("Getting vendor with id {}", id);
         return vendorRepository
                 .findById(IDHasher.hashId(id))

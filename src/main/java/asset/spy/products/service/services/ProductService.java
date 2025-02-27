@@ -7,7 +7,6 @@ import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.mapper.ProductMapper;
 import asset.spy.products.service.repositories.ProductRepository;
-import asset.spy.products.service.repositories.VendorRepository;
 import asset.spy.products.service.util.hashing.IDHasher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
-    private final VendorRepository vendorRepository;
+    private final VendorService vendorService;
     private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
@@ -52,7 +51,7 @@ public class ProductService {
     public ResponseProductDto saveProduct(SaveProductDto product, long vendorId) {
         log.info("Received product to save : {}", product);
 
-        VendorEntity vendor = findVendorById(vendorId);
+        VendorEntity vendor = vendorService.findVendorById(vendorId);
         log.info("Founded vendor to save : {}", vendor);
 
         ProductEntity productToSave = productMapper.toProduct(product);
@@ -90,7 +89,7 @@ public class ProductService {
     public List<ResponseProductDto> getProductsByVendorId(long id) {
         log.info("Get products by vendor with id {}", id);
 
-        VendorEntity vendor = findVendorById(id);
+        VendorEntity vendor = vendorService.findVendorById(id);
         log.info("Founded vendor to get products : {}", vendor);
 
         return vendor
@@ -98,13 +97,6 @@ public class ProductService {
                 .stream()
                 .map(productMapper::toResponseProductDto)
                 .collect(Collectors.toList());
-    }
-
-    private VendorEntity findVendorById(long id) {
-        log.info("Getting vendor with id {}", id);
-        return vendorRepository
-                .findById(IDHasher.hashId(id))
-                .orElseThrow(() -> new EntityNotFoundException("Vendor not found"));
     }
 
     private ProductEntity findProductById(long id) {

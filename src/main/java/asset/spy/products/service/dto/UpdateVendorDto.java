@@ -13,6 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateVendorDto {
 
+    @NotNull(message = "Id cannot be empty")
     private Long id;
 
     @NotNull(message = "Name cannot be empty")
