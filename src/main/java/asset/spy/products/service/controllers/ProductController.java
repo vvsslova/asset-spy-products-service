@@ -34,7 +34,7 @@ public class ProductController {
                                                 @RequestParam(required = false) String manufacturer,
                                                 @RequestParam(required = false)BigDecimal minPrice,
                                                 @RequestParam(required = false) BigDecimal maxPrice) {
-        return productService.getProducts(page, size, sortCriteria, name, type, manufacturer, minPrice, maxPrice);
+        return productService.getProducts(page, size, sortCriteria, name, type, manufacturer, maxPrice, minPrice);
     }
 
     @GetMapping("/{id}")

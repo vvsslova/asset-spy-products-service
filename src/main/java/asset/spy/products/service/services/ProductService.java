@@ -42,8 +42,8 @@ public class ProductService {
                 .where(ProductSpecification.hasName(name)
                         .and(ProductSpecification.hasType(type))
                         .and(ProductSpecification.hasManufacturer(manufacturer))
-                        .and(ProductSpecification.hasMaxPrice(maxPrice))
-                        .or(ProductSpecification.hasMinPrice(minPrice)));
+                        .and(ProductSpecification.maxPrice(maxPrice))
+                        .or(ProductSpecification.minPrice(minPrice)));
         return productRepository
                 .findAll(specification, PageRequest.of(page, size, Sort.by(sortCriteria)))
                 .map(productMapper::toResponseProductDto);

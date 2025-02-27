@@ -22,12 +22,12 @@ public class ProductSpecification {
                 manufacturer == null ? null : criteriaBuilder.equal(root.get("manufacturer"), manufacturer);
     }
 
-    public static Specification<ProductEntity> hasMinPrice(BigDecimal price) {
+    public static Specification<ProductEntity> maxPrice(BigDecimal price) {
         return (root, query, criteriaBuilder) ->
                 price == null ? null : criteriaBuilder.lessThanOrEqualTo(root.get("price"), price);
     }
 
-    public static Specification<ProductEntity> hasMaxPrice(BigDecimal price) {
+    public static Specification<ProductEntity> minPrice(BigDecimal price) {
         return (root, query, criteriaBuilder) ->
                 price == null ? null : criteriaBuilder.greaterThanOrEqualTo(root.get("price"), price);
     }
