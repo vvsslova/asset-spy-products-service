@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class VendorService {
     private final VendorRepository vendorRepository;
     private final VendorMapper vendorMapper;
+    private final SpecificationCreateService specificationCreateService;
 
     @Transactional(readOnly = true)
-    public Page<ResponseVendorDto> getVendors(int page, int size, String sortCriteria) {
+    public Page<ResponseVendorDto> getVendors(int page, int size, String sortCriteria,
+                                              String name, String country) {
 
         log.info("Get vendors from page {} of size {}", page, size);
 
+        Specification<VendorEntity> specification = specificationCreateService
+                .getVendorSpecification(name, country);
         return vendorRepository
-                .findAll(PageRequest.of(page, size, Sort.by(sortCriteria)))
+                .findAll(specification, PageRequest.of(page, size, Sort.by(sortCriteria)))
                 .map(vendorMapper::toResponseVendorDto);
     }
 

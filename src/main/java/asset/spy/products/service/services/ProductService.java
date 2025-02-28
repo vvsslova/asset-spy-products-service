@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,14 +29,19 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final VendorService vendorService;
     private final ProductMapper productMapper;
+    private final SpecificationCreateService specificationCreateService;
 
     @Transactional(readOnly = true)
-    public Page<ResponseProductDto> getProducts(int page, int size, String sortCriteria) {
+    public Page<ResponseProductDto> getProducts(int page, int size, String sortCriteria,
+                                                String name, String type, String manufacturer,
+                                                BigDecimal maxPrice, BigDecimal minPrice) {
 
         log.info("Get products from page {} of size {}", page, size);
 
+        Specification<ProductEntity> specification = specificationCreateService
+                .getProductSpecification(name, type, manufacturer, minPrice, maxPrice);
         return productRepository
-                .findAll(PageRequest.of(page, size, Sort.by(sortCriteria)))
+                .findAll(specification, PageRequest.of(page, size, Sort.by(sortCriteria)))
                 .map(productMapper::toResponseProductDto);
     }
 
