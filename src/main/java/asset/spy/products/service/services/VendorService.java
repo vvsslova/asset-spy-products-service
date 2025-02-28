@@ -7,7 +7,6 @@ import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.exception.EntityAlreadyExistsException;
 import asset.spy.products.service.mapper.VendorMapper;
 import asset.spy.products.service.repositories.VendorRepository;
-import asset.spy.products.service.specification.VendorSpecification;
 import asset.spy.products.service.util.hashing.IDHasher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class VendorService {
     private final VendorRepository vendorRepository;
     private final VendorMapper vendorMapper;
+    private final SpecificationCreateService specificationCreateService;
 
     @Transactional(readOnly = true)
     public Page<ResponseVendorDto> getVendors(int page, int size, String sortCriteria,
@@ -33,9 +33,8 @@ public class VendorService {
 
         log.info("Get vendors from page {} of size {}", page, size);
 
-        Specification<VendorEntity> specification = Specification
-                .where(VendorSpecification.hasName(name)
-                        .and(VendorSpecification.hasCountry(country)));
+        Specification<VendorEntity> specification = specificationCreateService
+                .getVendorSpecification(name, country);
         return vendorRepository
                 .findAll(specification, PageRequest.of(page, size, Sort.by(sortCriteria)))
                 .map(vendorMapper::toResponseVendorDto);

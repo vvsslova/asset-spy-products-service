@@ -7,11 +7,11 @@ public class VendorSpecification {
 
     public static Specification<VendorEntity> hasName(String name) {
         return (root, query, criteriaBuilder) ->
-                name == null ? null : criteriaBuilder.like(root.get("name"), "%" + name + "%");
+                name == null ? null : criteriaBuilder.like(root.get("name"), "%" + name.toLowerCase() + "%");
     }
 
     public static Specification<VendorEntity> hasCountry(String country) {
         return ((root, query, criteriaBuilder)
-                -> country == null ? null : criteriaBuilder.like(root.get("country"), "%" + country + "%"));
+                -> country == null ? null : criteriaBuilder.like(root.get("country"), "%" + country.toLowerCase() + "%"));
     }
 }

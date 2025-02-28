@@ -9,17 +9,17 @@ public class ProductSpecification {
 
     public static Specification<ProductEntity> hasName(String name) {
         return (root, query, criteriaBuilder) ->
-                name == null ? null : criteriaBuilder.like(root.get("name"), "%" + name + "%");
+                name == null ? null : criteriaBuilder.like(root.get("name"), "%" + name.toLowerCase() + "%");
     }
 
     public static Specification<ProductEntity> hasType(String type) {
         return (root, query, criteriaBuilder) ->
-                type == null ? null : criteriaBuilder.like(root.get("type"), "%" + type + "%");
+                type == null ? null : criteriaBuilder.like(root.get("type"), "%" + type.toLowerCase() + "%");
     }
 
     public static Specification<ProductEntity> hasManufacturer(String manufacturer) {
         return (root, query, criteriaBuilder) ->
-                manufacturer == null ? null : criteriaBuilder.equal(root.get("manufacturer"), manufacturer);
+                manufacturer == null ? null : criteriaBuilder.like(root.get("manufacturer"), "%" + manufacturer.toLowerCase() + "%");
     }
 
     public static Specification<ProductEntity> maxPrice(BigDecimal price) {

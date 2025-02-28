@@ -7,7 +7,6 @@ import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.mapper.ProductMapper;
 import asset.spy.products.service.repositories.ProductRepository;
-import asset.spy.products.service.specification.ProductSpecification;
 import asset.spy.products.service.util.hashing.IDHasher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -30,6 +29,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final VendorService vendorService;
     private final ProductMapper productMapper;
+    private final SpecificationCreateService specificationCreateService;
 
     @Transactional(readOnly = true)
     public Page<ResponseProductDto> getProducts(int page, int size, String sortCriteria,
@@ -38,12 +38,8 @@ public class ProductService {
 
         log.info("Get products from page {} of size {}", page, size);
 
-        Specification<ProductEntity> specification = Specification
-                .where(ProductSpecification.hasName(name)
-                        .and(ProductSpecification.hasType(type))
-                        .and(ProductSpecification.hasManufacturer(manufacturer))
-                        .and(ProductSpecification.maxPrice(maxPrice))
-                        .or(ProductSpecification.minPrice(minPrice)));
+        Specification<ProductEntity> specification = specificationCreateService
+                .getProductSpecification(name, type, manufacturer, minPrice, maxPrice);
         return productRepository
                 .findAll(specification, PageRequest.of(page, size, Sort.by(sortCriteria)))
                 .map(productMapper::toResponseProductDto);
