@@ -14,6 +14,7 @@ import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "Vendor")
@@ -35,6 +36,9 @@ public class VendorEntity {
 
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
+
+    @Column(name = "external_id")
+    private UUID externalId;
 
     @OneToMany(mappedBy = "vendor", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<ProductEntity> products;

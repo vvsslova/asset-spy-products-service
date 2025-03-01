@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +16,7 @@ import lombok.Setter;
 public class UpdateVendorDto {
 
     @NotNull(message = "Id cannot be empty")
-    private Long id;
+    private UUID id;
 
     @NotNull(message = "Name cannot be empty")
     @Size(max = 200, message = "Field cannot be greater than 200 characters")
