@@ -7,7 +7,6 @@ import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.exception.EntityAlreadyExistsException;
 import asset.spy.products.service.mapper.VendorMapper;
 import asset.spy.products.service.repositories.VendorRepository;
-import asset.spy.products.service.util.hashing.IDHasher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -41,7 +42,7 @@ public class VendorService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseVendorDto getVendorById(Long id) {
+    public ResponseVendorDto getVendorById(UUID id) {
         log.info("Start getting vendor with id {}", id);
 
         VendorEntity vendor = findVendorById(id);
@@ -70,14 +71,14 @@ public class VendorService {
 
         VendorEntity vendor = findVendorById(vendorDto.getId());
 
-        vendorMapper.updateVendor(vendor, vendorDto);
+        vendorMapper.updateVendor(vendorDto, vendor);
 
         log.info("Updated vendor : {}", vendor);
         return vendorMapper.toResponseVendorDto(vendor);
     }
 
     @Transactional
-    public ResponseVendorDto deleteVendor(Long id) {
+    public ResponseVendorDto deleteVendor(UUID id) {
         log.info("Received id to delete : {}", id);
 
         VendorEntity vendor = findVendorById(id);
@@ -88,10 +89,10 @@ public class VendorService {
         return vendorMapper.toResponseVendorDto(vendor);
     }
 
-    public VendorEntity findVendorById(Long id) {
+    public VendorEntity findVendorById(UUID id) {
         log.info("Getting vendor with id {}", id);
         return vendorRepository
-                .findById(IDHasher.hashId(id))
+                .findByExternalId(id)
                 .orElseThrow(() -> new EntityNotFoundException("This vendor does not exist"));
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/api/vendors")
@@ -38,7 +39,7 @@ public class VendorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseVendorDto getVendorById(@PathVariable Long id) {
+    public ResponseVendorDto getVendorById(@PathVariable UUID id) {
         return vendorService.getVendorById(id);
     }
 
@@ -53,12 +54,12 @@ public class VendorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseVendorDto deleteVendor(@PathVariable Long id) {
+    public ResponseVendorDto deleteVendor(@PathVariable UUID id) {
         return vendorService.deleteVendor(id);
     }
 
     @GetMapping("/{id}/products")
-    public List<ResponseProductDto> getVendorProducts(@PathVariable Long id) {
+    public List<ResponseProductDto> getVendorProducts(@PathVariable UUID id) {
         return productService.getProductsByVendorId(id);
     }
 }

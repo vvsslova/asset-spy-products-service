@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "Product")
@@ -42,6 +43,9 @@ public class ProductEntity {
 
     @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name = "external_id")
+    private UUID externalId;
 
     @ManyToOne
     @JoinColumn(name = "vendor_id", referencedColumnName = "id")

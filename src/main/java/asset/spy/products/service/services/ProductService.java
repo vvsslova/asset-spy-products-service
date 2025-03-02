@@ -7,7 +7,6 @@ import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.mapper.ProductMapper;
 import asset.spy.products.service.repositories.ProductRepository;
-import asset.spy.products.service.util.hashing.IDHasher;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +46,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseProductDto getProduct(long id) {
+    public ResponseProductDto getProduct(UUID id) {
         log.info("Start getting product with id {}", id);
 
         ProductEntity product = findProductById(id);
@@ -55,7 +55,7 @@ public class ProductService {
     }
 
     @Transactional
-    public ResponseProductDto saveProduct(SaveProductDto product, long vendorId) {
+    public ResponseProductDto saveProduct(SaveProductDto product, UUID vendorId) {
         log.info("Received product to save : {}", product);
 
         VendorEntity vendor = vendorService.findVendorById(vendorId);
@@ -75,14 +75,14 @@ public class ProductService {
 
         ProductEntity productToUpdate = findProductById(productDto.getId());
 
-        productMapper.updateProduct(productToUpdate, productDto);
+        productMapper.updateProduct(productDto, productToUpdate);
         log.info("Product to update : {}", productToUpdate);
 
         return productMapper.toResponseProductDto(productToUpdate);
     }
 
     @Transactional
-    public ResponseProductDto deleteProduct(long id) {
+    public ResponseProductDto deleteProduct(UUID id) {
         log.info("Received id to delete : {}", id);
 
         ProductEntity product = findProductById(id);
@@ -93,7 +93,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseProductDto> getProductsByVendorId(long id) {
+    public List<ResponseProductDto> getProductsByVendorId(UUID id) {
         log.info("Get products by vendor with id {}", id);
 
         VendorEntity vendor = vendorService.findVendorById(id);
@@ -106,10 +106,10 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    private ProductEntity findProductById(long id) {
+    private ProductEntity findProductById(UUID id) {
         log.info("Getting product with id {}", id);
         return productRepository
-                .findById(IDHasher.hashId(id))
+                .findByExternalId(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 }

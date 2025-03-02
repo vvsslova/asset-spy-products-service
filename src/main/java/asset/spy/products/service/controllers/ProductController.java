@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/api/products")
@@ -38,12 +39,12 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseProductDto getProduct(@PathVariable long id) {
+    public ResponseProductDto getProduct(@PathVariable UUID id) {
         return productService.getProduct(id);
     }
 
     @PostMapping("/save/{vendorId}")
-    public ResponseProductDto saveProduct(@Valid @RequestBody SaveProductDto productDto, @PathVariable long vendorId) {
+    public ResponseProductDto saveProduct(@Valid @RequestBody SaveProductDto productDto, @PathVariable UUID vendorId) {
         return productService.saveProduct(productDto, vendorId);
     }
 
@@ -53,7 +54,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseProductDto deleteProduct(@PathVariable long id) {
+    public ResponseProductDto deleteProduct(@PathVariable UUID id) {
         return productService.deleteProduct(id);
     }
 }

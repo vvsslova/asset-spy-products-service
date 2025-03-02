@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025.03.01_04
+      author: vvsslova@mail.ru
+      changes:
+        - addColumn:
+            schemaName: asset_spy_products_service_db
+            tableName: product
+            columns:
+              - column:
+                  name: external_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                  defaultValue: gen_random_uuid()
