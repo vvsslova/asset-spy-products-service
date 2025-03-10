@@ -36,28 +36,23 @@ public class ProductSpecificationTest {
     @ParameterizedTest
     @CsvSource({
             "name, 'test'",
-            "type, 'test",
-            "manufacturer, 'test"
+            "type, 'test'",
+            "manufacturer, 'test'"
     })
-    void hasField_nonNullValue_returnsSpecification(String field, String value) {
+    void specificationHasFieldTest(String field, String value) {
         Predicate expectedPredicate = mock(Predicate.class);
         String methodName = "has" + Character.toUpperCase(field.charAt(0)) + field.substring(1);
 
         when(cb.like(root.get(field), "%" + value + "%")).thenReturn(expectedPredicate);
 
-        Specification<ProductEntity> specification = null;
-        switch (methodName) {
-            case "hasName":
-                specification = ProductSpecification.hasName(value);
-                break;
-            case "hasType":
-                specification = ProductSpecification.hasType(value);
-                break;
-            case "hasManufacturer":
-                specification = ProductSpecification.hasManufacturer(value);
-                break;
-        }
+        Specification<ProductEntity> specification = switch (methodName) {
+            case "hasName" -> ProductSpecification.hasName(value);
+            case "hasType" -> ProductSpecification.hasType(value);
+            case "hasManufacturer" -> ProductSpecification.hasManufacturer(value);
+            default -> null;
+        };
         Predicate result = specification.toPredicate(root, query, cb);
+
         assertThat(result).isEqualTo(expectedPredicate);
         verify(cb, times(1)).like(root.get(field), "%" + value + "%");
     }
@@ -65,23 +60,18 @@ public class ProductSpecificationTest {
     @ParameterizedTest
     @CsvSource({
             "name, 'test'",
-            "type, 'test",
-            "manufacturer, 'test"
+            "type, 'test'",
+            "manufacturer, 'test'"
     })
-    void hasField_nullValue_returnsNull(String field, String value) {
-        Specification<ProductEntity> specification = null;
-        switch (field) {
-            case "name":
-                specification = ProductSpecification.hasName(null);
-                break;
-            case "type":
-                specification = ProductSpecification.hasType(null);
-                break;
-            case "manufacturer":
-                specification = ProductSpecification.hasManufacturer(null);
-                break;
-        }
+    void specificationHasNullValueFieldsTest(String field) {
+        Specification<ProductEntity> specification = switch (field) {
+            case "name" -> ProductSpecification.hasName(null);
+            case "type" -> ProductSpecification.hasType(null);
+            case "manufacturer" -> ProductSpecification.hasManufacturer(null);
+            default -> null;
+        };
         Predicate result = specification.toPredicate(root, query, cb);
+
         assertThat(result).isNull();
     }
 
@@ -90,7 +80,7 @@ public class ProductSpecificationTest {
             "maxPrice, 100",
             "minPrice, 50"
     })
-    void priceField_nonNullValue_returnsSpecification(String field, BigDecimal value) {
+    void specificationHasPriceFieldTest(String field, BigDecimal value) {
         Predicate expectedPredicate = mock(Predicate.class);
         switch (field) {
             case "maxPrice":
@@ -128,16 +118,12 @@ public class ProductSpecificationTest {
             "maxPrice, 100",
             "minPrice, 50"
     })
-    void priceField_nullValue_returnsNull(String field) {
-        Specification<ProductEntity> specification = null;
-        switch (field) {
-            case "maxPrice":
-                specification = ProductSpecification.maxPrice(null);
-                break;
-            case "minPrice":
-                specification = ProductSpecification.minPrice(null);
-                break;
-        }
+    void specificationHasNullValuePriceFieldTest(String field) {
+        Specification<ProductEntity> specification = switch (field) {
+            case "maxPrice" -> ProductSpecification.maxPrice(null);
+            case "minPrice" -> ProductSpecification.minPrice(null);
+            default -> null;
+        };
         Predicate result = specification.toPredicate(root, query, cb);
         assertThat(result).isNull();
     }

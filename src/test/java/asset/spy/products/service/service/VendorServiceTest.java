@@ -1,5 +1,6 @@
 package asset.spy.products.service.service;
 
+import asset.spy.products.service.AbstractInitialization;
 import asset.spy.products.service.dto.ResponseVendorDto;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.exception.EntityAlreadyExistsException;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+
 import java.util.Collections;
 import java.util.Optional;
 
@@ -48,7 +50,7 @@ public class VendorServiceTest extends AbstractInitialization {
     private VendorMapper vendorMapper;
 
     @Test
-    void saveVendor_validInput_returnVendorDto() {
+    void saveVendorIfVendorNotExistsTest() {
         when(vendorMapper.toVendorEntity(any())).thenReturn(vendor);
         when(vendorRepository.save(any())).thenReturn(vendor);
         when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
@@ -62,7 +64,7 @@ public class VendorServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void saveVendor_invalidInput_throwException() {
+    void saveVendorIfVendorAlreadyExistsTest() {
         when(vendorMapper.toVendorEntity(saveVendorDto)).thenReturn(vendor);
         when(vendorRepository.save(vendor)).thenThrow(new DataIntegrityViolationException("Duplicate vendor"));
 
@@ -73,20 +75,21 @@ public class VendorServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void updateVendor_validInput_returnVendorDto() {
+    void updateVendorIfVendorExistsTest() {
         updateVendorDto.setId(vendorId);
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.of(vendor));
         when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
 
         ResponseVendorDto result = vendorService.updateVendor(updateVendorDto);
+
         assertThat(result).isEqualTo(responseVendorDto);
         verify(vendorRepository).findByExternalId(vendorId);
-        vendorMapper.updateVendor(updateVendorDto, vendor);
+        verify(vendorMapper).updateVendor(updateVendorDto, vendor);
         verify(vendorMapper).toResponseVendorDto(vendor);
     }
 
     @Test
-    void updateVendor_NonExistingVendor_throwException() {
+    void updateVendorIfVendorNotExistsTest() {
         updateVendorDto.setId(vendorId);
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.empty());
 
@@ -96,12 +99,13 @@ public class VendorServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void deleteVendor_validInput_returnVendorDto() {
+    void deleteVendorIfVendorExistsTest() {
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.of(vendor));
         when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
         doNothing().when(vendorRepository).delete(vendor);
 
         ResponseVendorDto result = vendorService.deleteVendor(vendorId);
+
         assertThat(result).isEqualTo(responseVendorDto);
         verify(vendorRepository).findByExternalId(vendorId);
         verify(vendorRepository).delete(vendor);
@@ -109,35 +113,59 @@ public class VendorServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void deleteVendor_invalidInput_throwException() {
+    void deleteVendorIfVendorNotExistsTest() {
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.empty());
+
         assertThrows(EntityNotFoundException.class, () -> vendorService.deleteVendor(vendorId));
         verify(vendorRepository).findByExternalId(vendorId);
         verifyNoMoreInteractions(vendorRepository, vendorMapper);
     }
 
     @Test
-    void getVendorById_validInput_returnVendorDto() {
+    void getVendorByIdIfVendorExistsTest() {
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.of(vendor));
         when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
 
         ResponseVendorDto result = vendorService.getVendorById(vendorId);
+
         assertThat(result).isEqualTo(responseVendorDto);
         verify(vendorRepository).findByExternalId(vendorId);
         verify(vendorMapper).toResponseVendorDto(vendor);
     }
 
     @Test
-    void getVendorById_invalidInput_throwException() {
+    void getVendorByIdIfVendorNotExistsTest() {
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.empty());
+
         assertThrows(EntityNotFoundException.class, () -> vendorService.getVendorById(vendorId));
         verify(vendorRepository).findByExternalId(vendorId);
         verifyNoMoreInteractions(vendorMapper);
     }
 
     @Test
-    void getVendors_validInput_returnPageResult() {
-        Page<VendorEntity> vendorPage = new PageImpl<>(Collections.singletonList(vendor), PageRequest.of(PAGE, SIZE, Sort.by(SORT_CRITERIA)), 1);
+    void getVendorsWithoutFiltersTest() {
+        Page<VendorEntity> vendorPage = new PageImpl<>(Collections.singletonList(vendor),
+                PageRequest.of(PAGE, SIZE, Sort.by(SORT_CRITERIA)), 1);
+        Specification<VendorEntity> vendorSpecification = Specification.where(null);
+
+        when(specificationCreateService.getVendorSpecification(null, null)).thenReturn(vendorSpecification);
+        when(vendorRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(vendorPage);
+        when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
+
+        Page<ResponseVendorDto> result = vendorService.getVendors(PAGE, SIZE, SORT_CRITERIA, null, null);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0)).isEqualTo(responseVendorDto);
+
+        verify(specificationCreateService).getVendorSpecification(null, null);
+        verify(vendorRepository).findAll(any(Specification.class), any(Pageable.class));
+        verify(vendorMapper).toResponseVendorDto(vendor);
+    }
+
+    @Test
+    void getVendorsWithFiltersAndSortTest() {
+        Page<VendorEntity> vendorPage = new PageImpl<>(Collections.singletonList(vendor));
         Specification<VendorEntity> vendorSpecification = Specification.where(null);
 
         when(specificationCreateService.getVendorSpecification(NAME, COUNTRY)).thenReturn(vendorSpecification);

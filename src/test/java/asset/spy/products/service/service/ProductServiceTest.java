@@ -2,6 +2,7 @@ package asset.spy.products.service.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import asset.spy.products.service.AbstractInitialization;
 import asset.spy.products.service.dto.ResponseProductDto;
 import asset.spy.products.service.dto.SaveProductDto;
 import asset.spy.products.service.entity.ProductEntity;
@@ -57,7 +58,7 @@ public class ProductServiceTest extends AbstractInitialization {
     private SpecificationCreateService specificationCreateService;
 
     @Test
-    void saveProduct_ValidInput_ReturnsNewProductDto() {
+    void saveProductIfNotExistsTest() {
         when(vendorService.findVendorById(vendorId)).thenReturn(vendor);
         when(productMapper.toProduct(any(SaveProductDto.class))).thenReturn(product);
         when(productRepository.save(any(ProductEntity.class))).thenReturn(product);
@@ -66,7 +67,6 @@ public class ProductServiceTest extends AbstractInitialization {
         ResponseProductDto result = productService.saveProduct(saveProductDto, vendorId);
 
         assertThat(result).isEqualTo(responseProductDto);
-
         verify(vendorService).findVendorById(vendorId);
         verify(productMapper).toProduct(saveProductDto);
         verify(productRepository).save(product);
@@ -74,7 +74,7 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void saveProduct_NonExistingVendor_ThrowsException() {
+    void saveProductIfVendorNotExistTest() {
         when(vendorService.findVendorById(vendorId)).thenThrow(new EntityNotFoundException("Vendor not found"));
 
         assertThrows(EntityNotFoundException.class, () -> productService.saveProduct(saveProductDto, vendorId));
@@ -82,7 +82,7 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void updateProduct_ValidInput_ReturnsUpdatedProductDto() {
+    void updateProductIfProductExistsTest() {
         when(productRepository.findByExternalId(productId)).thenReturn(Optional.of(product));
         when(productMapper.toResponseProductDto(product)).thenReturn(responseProductDto);
 
@@ -94,14 +94,15 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void updateProduct_NonExistingProduct_ThrowsException() {
+    void updateProductIfProductNotExistsTest() {
         when(productRepository.findByExternalId(productId)).thenReturn(Optional.empty());
+
         assertThrows(EntityNotFoundException.class, () -> productService.updateProduct(updateProductDto));
         verify(productRepository).findByExternalId(productId);
     }
 
     @Test
-    void deleteProduct_ValidInput_DeleteProduct() {
+    void deleteProductIfProductExistsTest() {
         when(productRepository.findByExternalId(productId)).thenReturn(Optional.of(product));
         doNothing().when(productRepository).delete(product);
 
@@ -112,20 +113,20 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void deleteProduct_NonExistingProduct_ThrowsException() {
+    void deleteProductIfProductNotExistsTest() {
         when(productRepository.findByExternalId(productId)).thenReturn(Optional.empty());
+
         assertThrows(EntityNotFoundException.class, () -> productService.deleteProduct(productId));
         verify(productRepository).findByExternalId(productId);
         verifyNoMoreInteractions(productRepository, productMapper);
     }
 
     @Test
-    void getProductsByVendor_ValidInput_ReturnsProducts() {
+    void getProductsByVendorIfVendorExistsTest() {
         List<ProductEntity> products = Collections.singletonList(product);
+        vendor.setProducts(products);
         when(vendorService.findVendorById(vendorId)).thenReturn(vendor);
         when(productMapper.toResponseProductDto(product)).thenReturn(responseProductDto);
-
-        vendor.setProducts(products);
 
         List<ResponseProductDto> result = productService.getProductsByVendorId(vendorId);
 
@@ -136,7 +137,7 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void getProductsByVendor_NonExistingVendor_ThrowsException() {
+    void getProductsByVendorIfVendorNotExistsTest() {
         when(vendorService.findVendorById(vendorId)).thenThrow(new EntityNotFoundException("Vendor not found"));
 
         assertThrows(EntityNotFoundException.class, () -> productService.getProductsByVendorId(vendorId));
@@ -146,7 +147,7 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void getProductsByVendor_ExistingVendorWithNoProducts_ReturnEmptyList() {
+    void getProductsByVendorIfVendorHasNoProductsTest() {
         when(vendorService.findVendorById(vendorId)).thenReturn(vendor);
         vendor.setProducts(Collections.emptyList());
         List<ResponseProductDto> result = productService.getProductsByVendorId(vendorId);
@@ -158,45 +159,64 @@ public class ProductServiceTest extends AbstractInitialization {
     }
 
     @Test
-    void getProductByExternalId_ValidInput_ReturnsProduct() {
-        UUID externalId = UUID.randomUUID();
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setExternalId(externalId);
-        ResponseProductDto responseProductDto = new ResponseProductDto();
-        responseProductDto.setId(externalId);
-
-        when(productRepository.findByExternalId(externalId)).thenReturn(Optional.of(product));
+    void getProductByExternalIdIfProductExistsTest() {
+        when(productRepository.findByExternalId(productId)).thenReturn(Optional.of(product));
         when(productMapper.toResponseProductDto(product)).thenReturn(responseProductDto);
 
-        ResponseProductDto result = productService.getProduct(externalId);
+        ResponseProductDto result = productService.getProduct(productId);
 
-        assertNotNull(result);
-        assertEquals(externalId, result.getId());
-        verify(productRepository).findByExternalId(externalId);
+        assertThat(result).isEqualTo(responseProductDto);
+        verify(productRepository).findByExternalId(productId);
         verify(productMapper).toResponseProductDto(product);
     }
 
     @Test
-    void getProductByExternalId_NonExistingProduct_ThrowsException() {
-        UUID externalId = UUID.randomUUID();
-        when(productRepository.findByExternalId(externalId)).thenReturn(Optional.empty());
+    void getProductByExternalIdIfProductNotExistsTest() {
+        when(productRepository.findByExternalId(any(UUID.class))).thenReturn(Optional.empty());
+        EntityNotFoundException e = assertThrows(EntityNotFoundException.class, ()
+                -> productService.getProduct(UUID.randomUUID()));
 
-        EntityNotFoundException e = assertThrows(EntityNotFoundException.class, () -> productService.getProduct(externalId));
         assertEquals("Product not found", e.getMessage());
-        verify(productRepository).findByExternalId(externalId);
+        verify(productRepository).findByExternalId(any(UUID.class));
         verify(productMapper, never()).toResponseProductDto(any());
     }
 
     @Test
-    void getProducts_validInput_ReturnPageResult() {
-        Page<ProductEntity> productPage = new PageImpl<>(Collections.singletonList(product), PageRequest.of(PAGE, SIZE, Sort.by(SORT_CRITERIA)), 1);
+    void getProductsWithoutFiltersTest() {
+        Page<ProductEntity> productPage = new PageImpl<>(Collections.singletonList(product),
+                PageRequest.of(PAGE, SIZE, Sort.by(SORT_CRITERIA)), 1);
         Specification<ProductEntity> productSpecification = Specification.where(null);
 
-        when(specificationCreateService.getProductSpecification(NAME, TYPE, MANUFACTURER, MIN_PRICE, MAX_PRICE)).thenReturn(productSpecification);
+        when(specificationCreateService.getProductSpecification(null, null, null, null, null))
+                .thenReturn(productSpecification);
         when(productRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(productPage);
         when(productMapper.toResponseProductDto(product)).thenReturn(responseProductDto);
 
-        Page<ResponseProductDto> result = productService.getProducts(PAGE, SIZE, SORT_CRITERIA, NAME, TYPE, MANUFACTURER, MAX_PRICE, MIN_PRICE);
+        Page<ResponseProductDto> result = productService.getProducts(PAGE, SIZE, SORT_CRITERIA,
+                null, null, null, null, null);
+
+        assertNotNull(result);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0)).isEqualTo(responseProductDto);
+
+        verify(specificationCreateService).getProductSpecification(null, null, null, null, null);
+        verify(productRepository).findAll(any(Specification.class), any(Pageable.class));
+        verify(productMapper).toResponseProductDto(product);
+    }
+
+    @Test
+    void getProductsWithFiltersTest() {
+        Page<ProductEntity> productPage = new PageImpl<>(Collections.singletonList(product),
+                PageRequest.of(PAGE, SIZE, Sort.by(SORT_CRITERIA)), 1);
+        Specification<ProductEntity> productSpecification = Specification.where(null);
+
+        when(specificationCreateService.getProductSpecification(NAME, TYPE, MANUFACTURER, MIN_PRICE, MAX_PRICE))
+                .thenReturn(productSpecification);
+        when(productRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(productPage);
+        when(productMapper.toResponseProductDto(product)).thenReturn(responseProductDto);
+
+        Page<ResponseProductDto> result = productService.getProducts(PAGE, SIZE, SORT_CRITERIA,
+                NAME, TYPE, MANUFACTURER, MAX_PRICE, MIN_PRICE);
 
         assertNotNull(result);
         assertThat(result.getTotalElements()).isEqualTo(1);

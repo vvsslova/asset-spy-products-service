@@ -30,7 +30,7 @@ public class VendorSpecificationTest {
     private CriteriaQuery<?> query;
 
     @Test
-    void hasName_nonNullName_returnSpecificationWithLikePredicate() {
+    void specificationHasNameFieldTest() {
         String name = "name";
         Predicate expected = mock(Predicate.class);
 
@@ -44,7 +44,7 @@ public class VendorSpecificationTest {
     }
 
     @Test
-    void hasName_nullName_returnsNull() {
+    void specificationHasNullNameFieldTest() {
         Specification<VendorEntity> specification = VendorSpecification.hasName(null);
         Predicate result = specification.toPredicate(root, query, cb);
 
@@ -52,7 +52,7 @@ public class VendorSpecificationTest {
     }
 
     @Test
-    void hasCountry_nonNullCountry_returnSpecificationWithLikePredicate() {
+    void specificationHasCountryFieldTest() {
         String country = "country";
         Predicate expected = mock(Predicate.class);
 
@@ -66,7 +66,7 @@ public class VendorSpecificationTest {
     }
 
     @Test
-    void hasCountry_nullCountry_returnsNull() {
+    void specificationHasNullCountryFieldTest() {
         Specification<VendorEntity> specification = VendorSpecification.hasCountry(null);
         Predicate result = specification.toPredicate(root, query, cb);
         assertThat(result).isNull();

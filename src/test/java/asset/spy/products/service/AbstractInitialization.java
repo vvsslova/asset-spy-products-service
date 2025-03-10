@@ -1,4 +1,4 @@
-package asset.spy.products.service.service;
+package asset.spy.products.service;
 
 import asset.spy.products.service.dto.ResponseProductDto;
 import asset.spy.products.service.dto.ResponseVendorDto;
@@ -8,16 +8,11 @@ import asset.spy.products.service.dto.UpdateProductDto;
 import asset.spy.products.service.dto.UpdateVendorDto;
 import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@ExtendWith(MockitoExtension.class)
-@Slf4j
 public abstract class AbstractInitialization {
 
     protected static final int PAGE = 0;
