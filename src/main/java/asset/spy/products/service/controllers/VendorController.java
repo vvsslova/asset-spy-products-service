@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/api/vendors")
+@RequestMapping("/v1/vendors")
 @AllArgsConstructor
 public class VendorController {
     private final VendorService vendorService;

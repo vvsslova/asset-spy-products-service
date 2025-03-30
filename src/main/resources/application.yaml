@@ -1,3 +1,5 @@
+server:
+  port: 8081
 spring:
   application:
     name: asset-spy-products-service
@@ -17,4 +19,5 @@ spring:
   liquibase:
     enabled: true
     default-schema: asset_spy_products_service_db
-hasher_password: 8724067958093891
+jwt:
+  secret-key: co7IB8BVZ2ZCWoyjnKbrX4ByykVOvY38vtv2DNK9kN4=

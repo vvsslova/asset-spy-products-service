@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/api/products")
+@RequestMapping("/v1/products")
 @AllArgsConstructor
 public class ProductController {
     private final ProductService productService;
