@@ -1,7 +1,7 @@
 databaseChangeLog:
   - include:
-      file: "01_create_vendor_table.yaml"
+      file: "01-create-vendor-table.yaml"
       relativeToChangelogFile: true
   - include:
-      file: "02_create_product_table.yaml"
+      file: "02-create-product-table.yaml"
       relativeToChangelogFile: true
