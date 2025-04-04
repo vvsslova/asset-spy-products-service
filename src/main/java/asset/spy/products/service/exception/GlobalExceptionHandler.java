@@ -6,26 +6,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import java.util.List;
+
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    private ResponseEntity<ErrorResponseDto> handleException(MethodArgumentNotValidException e) {
-        StringBuilder msg = new StringBuilder("Validation error: ");
-        e.getBindingResult().getFieldErrors()
-                .forEach(error -> {
-                    msg.append(error.getField())
-                            .append(": ")
-                            .append(error.getDefaultMessage())
-                            .append("; ");
-                });
-        log.error(msg.toString(), e);
-        ErrorResponseDto response = new ErrorResponseDto(msg.toString());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    private ResponseEntity<List<ErrorResponseDto>> handleException(MethodArgumentNotValidException e) {
+        List<ErrorResponseDto> errors = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> new ErrorResponseDto(error.getDefaultMessage()))
+                .toList();
+        log.error("Validation exception", e);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
