@@ -1,8 +1,8 @@
 package asset.spy.products.service.mapper;
 
-import asset.spy.products.service.dto.ResponseProductDto;
-import asset.spy.products.service.dto.SaveProductDto;
-import asset.spy.products.service.dto.UpdateProductDto;
+import asset.spy.products.service.dto.http.product.ResponseProductDto;
+import asset.spy.products.service.dto.http.product.CreateProductDto;
+import asset.spy.products.service.dto.http.product.UpdateProductDto;
 import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.AbstractInitialization;
 import org.junit.jupiter.api.Test;
@@ -15,9 +15,9 @@ public class ProductMapperTest extends AbstractInitialization {
 
     @Test
     void saveProductDtoToProductEntityTest() {
-        SaveProductDto productDto = saveProductDto;
+        CreateProductDto productDto = createProductDto;
 
-        ProductEntity productEntity = productMapper.toProduct(productDto);
+        ProductEntity productEntity = productMapper.toProduct(productDto, PRODUCT_ARTICLE);
 
         assertThat(productDto)
                 .usingRecursiveComparison()

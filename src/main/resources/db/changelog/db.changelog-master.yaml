@@ -3,3 +3,5 @@ databaseChangeLog:
       file: "db/changelog/2025.02.21/db.changelog-release.yaml"
   - include:
       file: "db/changelog/2025.03.01/db.changelog-release.yaml"
+  - include:
+      file: "db/changelog/2025.04.28/db.changelog-release.yaml"

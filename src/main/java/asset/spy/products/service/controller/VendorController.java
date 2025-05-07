@@ -1,11 +1,11 @@
-package asset.spy.products.service.controllers;
+package asset.spy.products.service.controller;
 
-import asset.spy.products.service.dto.ResponseProductDto;
-import asset.spy.products.service.dto.ResponseVendorDto;
-import asset.spy.products.service.dto.SaveVendorDto;
-import asset.spy.products.service.dto.UpdateVendorDto;
-import asset.spy.products.service.services.ProductService;
-import asset.spy.products.service.services.VendorService;
+import asset.spy.products.service.dto.http.product.ResponseProductDto;
+import asset.spy.products.service.dto.http.vendor.ResponseVendorDto;
+import asset.spy.products.service.dto.http.vendor.CreateVendorDto;
+import asset.spy.products.service.dto.http.vendor.UpdateVendorDto;
+import asset.spy.products.service.service.ProductService;
+import asset.spy.products.service.service.VendorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,7 +44,7 @@ public class VendorController {
     }
 
     @PostMapping("/save")
-    public ResponseVendorDto save(@Valid @RequestBody SaveVendorDto vendorDto) {
+    public ResponseVendorDto save(@Valid @RequestBody CreateVendorDto vendorDto) {
         return vendorService.saveVendor(vendorDto);
     }
 

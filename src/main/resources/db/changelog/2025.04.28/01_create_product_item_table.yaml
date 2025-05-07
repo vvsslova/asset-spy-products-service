@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025.04.28_01
+      author: vvsslova@mail.ru
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        not:
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product_item
+              columnName: id
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product_id
+              columnName: status
+      changes:
+        - createTable:
+            schemaName: asset_spy_products_service_db
+            tableName: product_item
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: product_item
+            baseColumnNames: product_id
+            constraintName: FK_product_id
+            referencedTableName: product
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT

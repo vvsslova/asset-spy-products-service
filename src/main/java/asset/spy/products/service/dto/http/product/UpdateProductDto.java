@@ -1,4 +1,4 @@
-package asset.spy.products.service.dto;
+package asset.spy.products.service.dto.http.product;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,7 +16,10 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveProductDto {
+public class UpdateProductDto {
+
+    @NotNull(message = "Article cannot be empty")
+    private Long article;
 
     @NotNull(message = "Name cannot be empty")
     @Size(max = 200, message = "Field cannot be greater than 200 characters")

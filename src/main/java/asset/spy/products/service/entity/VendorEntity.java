@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Vendor")
+@Table(name = "vendor")
 @NoArgsConstructor
 @Getter
 @Setter

@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025.04.28_02
+      author: vvsslova@mail.ru
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        not:
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product_item_status
+              columnName: id
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product_item_status
+              columnName: status
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product_item_status
+              columnName: status_transition_time
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product_item_status
+              columnName: product_item_id
+      changes:
+        - createTable:
+            schemaName: asset_spy_products_service_db
+            tableName: product_item_status
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar (100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status_transition_time
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_item_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: product_item_status
+            baseColumnNames: product_item_id
+            constraintName: FK_specific_product
+            referencedTableName: product_item
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT

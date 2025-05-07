@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: "01_create_product_item_table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "02_create_product_item_status_table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "03_change_product_table.yaml"
+      relativeToChangelogFile: true

@@ -13,40 +13,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "product")
+@Table(name = "product_item_status")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
-public class ProductEntity {
+public class ProductItemStatusEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "status", nullable = false)
+    private String status;
 
-    @Column(name = "type")
-    private String type;
-
-    @Column(name = "manufacturer")
-    private String manufacturer;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "price")
-    private BigDecimal price;
-
-    @Column(name = "article")
-    private Long article;
+    @Column(name = "status_transition_time", nullable = false)
+    private OffsetDateTime statusTransitionTime;
 
     @ManyToOne
-    @JoinColumn(name = "vendor_id", referencedColumnName = "id")
-    private VendorEntity vendor;
+    @JoinColumn(name = "product_item_id", referencedColumnName = "id", nullable = false)
+    private ProductItemEntity productItem;
 }

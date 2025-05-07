@@ -1,8 +1,8 @@
 package asset.spy.products.service.mapper;
 
-import asset.spy.products.service.dto.ResponseVendorDto;
-import asset.spy.products.service.dto.SaveVendorDto;
-import asset.spy.products.service.dto.UpdateVendorDto;
+import asset.spy.products.service.dto.http.vendor.CreateVendorDto;
+import asset.spy.products.service.dto.http.vendor.ResponseVendorDto;
+import asset.spy.products.service.dto.http.vendor.UpdateVendorDto;
 import asset.spy.products.service.entity.VendorEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -17,7 +17,7 @@ public interface VendorMapper {
 
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "externalId", ignore = true)
-    VendorEntity toVendorEntity(SaveVendorDto vendorDTO);
+    VendorEntity toVendorEntity(CreateVendorDto vendorDTO);
 
     @Mapping(source = "externalId", target = "id")
     ResponseVendorDto toResponseVendorDto(VendorEntity vendor);

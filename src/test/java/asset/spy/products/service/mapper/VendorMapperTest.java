@@ -1,8 +1,8 @@
 package asset.spy.products.service.mapper;
 
-import asset.spy.products.service.dto.ResponseVendorDto;
-import asset.spy.products.service.dto.SaveVendorDto;
-import asset.spy.products.service.dto.UpdateVendorDto;
+import asset.spy.products.service.dto.http.vendor.ResponseVendorDto;
+import asset.spy.products.service.dto.http.vendor.CreateVendorDto;
+import asset.spy.products.service.dto.http.vendor.UpdateVendorDto;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.AbstractInitialization;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class VendorMapperTest extends AbstractInitialization {
 
     @Test
     void saveVendorDtoToVendorEntityTest() {
-        SaveVendorDto vendorDto = saveVendorDto;
+        CreateVendorDto vendorDto = createVendorDto;
 
         VendorEntity vendorEntity = vendorMapper.toVendorEntity(vendorDto);
 
