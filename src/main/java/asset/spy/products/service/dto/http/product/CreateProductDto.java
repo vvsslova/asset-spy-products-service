@@ -1,4 +1,4 @@
-package asset.spy.products.service.dto;
+package asset.spy.products.service.dto.http.product;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -11,16 +11,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateProductDto {
-
-    @NotNull(message = "Id cannot be empty")
-    private UUID id;
+public class CreateProductDto {
 
     @NotNull(message = "Name cannot be empty")
     @Size(max = 200, message = "Field cannot be greater than 200 characters")

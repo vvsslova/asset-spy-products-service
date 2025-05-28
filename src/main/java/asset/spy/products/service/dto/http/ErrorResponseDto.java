@@ -1,4 +1,4 @@
-package asset.spy.products.service.dto;
+package asset.spy.products.service.dto.http;
 
 import lombok.Getter;
 import lombok.Setter;

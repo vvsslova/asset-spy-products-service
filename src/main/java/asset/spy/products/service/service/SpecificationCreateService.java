@@ -1,4 +1,4 @@
-package asset.spy.products.service.services;
+package asset.spy.products.service.service;
 
 import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;

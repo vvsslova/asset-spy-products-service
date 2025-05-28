@@ -21,3 +21,13 @@ spring:
     default-schema: asset_spy_products_service_db
 jwt:
   secret-key: co7IB8BVZ2ZCWoyjnKbrX4ByykVOvY38vtv2DNK9kN4=
+kafka:
+  count-partitions: 3
+  vendor-topic-prefix: 'topic_vendor_'
+  bootstrap-servers: localhost:9092
+  listener-prefix: 'kafkaListenerId-'
+  concurrency: 3
+  consumer-properties:
+    "[bootstrap.servers]": localhost:9092
+    "[group.id]": asset-spy-products-service
+    "[auto.offset.reset]": earliest

@@ -1,4 +1,4 @@
-package asset.spy.products.service.dto;
+package asset.spy.products.service.dto.http.vendor;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -7,11 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveVendorDto {
+public class UpdateVendorDto {
+
+    @NotNull(message = "Id cannot be empty")
+    private UUID id;
 
     @NotNull(message = "Name cannot be empty")
     @Size(max = 200, message = "Field cannot be greater than 200 characters")

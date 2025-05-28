@@ -1,9 +1,9 @@
-package asset.spy.products.service.controllers;
+package asset.spy.products.service.controller;
 
-import asset.spy.products.service.dto.ResponseProductDto;
-import asset.spy.products.service.dto.SaveProductDto;
-import asset.spy.products.service.dto.UpdateProductDto;
-import asset.spy.products.service.services.ProductService;
+import asset.spy.products.service.dto.http.product.ResponseProductDto;
+import asset.spy.products.service.dto.http.product.CreateProductDto;
+import asset.spy.products.service.dto.http.product.UpdateProductDto;
+import asset.spy.products.service.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,13 +38,13 @@ public class ProductController {
         return productService.getProducts(page, size, sortCriteria, name, type, manufacturer, maxPrice, minPrice);
     }
 
-    @GetMapping("/{id}")
-    public ResponseProductDto getProduct(@PathVariable UUID id) {
-        return productService.getProduct(id);
+    @GetMapping("/{article}")
+    public ResponseProductDto getProduct(@PathVariable Long article) {
+        return productService.getProduct(article);
     }
 
     @PostMapping("/save/{vendorId}")
-    public ResponseProductDto saveProduct(@Valid @RequestBody SaveProductDto productDto, @PathVariable UUID vendorId) {
+    public ResponseProductDto saveProduct(@Valid @RequestBody CreateProductDto productDto, @PathVariable UUID vendorId) {
         return productService.saveProduct(productDto, vendorId);
     }
 
@@ -53,8 +53,8 @@ public class ProductController {
         return productService.updateProduct(productDto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseProductDto deleteProduct(@PathVariable UUID id) {
-        return productService.deleteProduct(id);
+    @DeleteMapping("/{article}")
+    public ResponseProductDto deleteProduct(@PathVariable Long article) {
+        return productService.deleteProduct(article);
     }
 }

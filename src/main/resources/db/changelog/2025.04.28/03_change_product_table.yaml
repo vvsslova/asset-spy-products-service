@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2025.04.28_03
+      author: vvsslova@mail.ru
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        not:
+          - columnExists:
+              schemaName: asset_spy_products_service_db
+              tableName: product
+              columnName: article
+      changes:
+        - createSequence:
+            sequenceName: product_article_seq
+            startValue: 10000000
+        - addColumn:
+            schemaName: asset_spy_products_service_db
+            tableName: product
+            columns:
+              - column:
+                  name: article
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+                  defaultValue: "nextval('product_article_seq')"
+        - dropColumn:
+            schemaName: asset_spy_products_service_db
+            tableName: product
+            columnName: external_id

@@ -1,11 +1,11 @@
 package asset.spy.products.service;
 
-import asset.spy.products.service.dto.ResponseProductDto;
-import asset.spy.products.service.dto.ResponseVendorDto;
-import asset.spy.products.service.dto.SaveProductDto;
-import asset.spy.products.service.dto.SaveVendorDto;
-import asset.spy.products.service.dto.UpdateProductDto;
-import asset.spy.products.service.dto.UpdateVendorDto;
+import asset.spy.products.service.dto.http.product.CreateProductDto;
+import asset.spy.products.service.dto.http.product.ResponseProductDto;
+import asset.spy.products.service.dto.http.vendor.ResponseVendorDto;
+import asset.spy.products.service.dto.http.vendor.CreateVendorDto;
+import asset.spy.products.service.dto.http.product.UpdateProductDto;
+import asset.spy.products.service.dto.http.vendor.UpdateVendorDto;
 import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,42 +24,41 @@ public abstract class AbstractInitialization {
     protected static final String MANUFACTURER = "Manufacturer";
     protected static final BigDecimal MAX_PRICE = BigDecimal.valueOf(100);
     protected static final BigDecimal MIN_PRICE = BigDecimal.valueOf(50);
+    protected static final Long PRODUCT_ARTICLE = 1000000L;
 
-    protected static UUID productId;
     protected static UUID vendorId;
 
     protected static ProductEntity product;
     protected static VendorEntity vendor;
     protected static ResponseProductDto responseProductDto;
     protected static UpdateProductDto updateProductDto;
-    protected static SaveProductDto saveProductDto;
-    protected static SaveVendorDto saveVendorDto;
+    protected static CreateProductDto createProductDto;
+    protected static CreateVendorDto createVendorDto;
     protected static UpdateVendorDto updateVendorDto;
     protected static ResponseVendorDto responseVendorDto;
 
     @BeforeAll
     public static void init() {
-        productId = UUID.randomUUID();
         vendorId = UUID.randomUUID();
 
         product = createProduct();
         vendor = createVendor();
-        saveProductDto = createSaveProductDto();
+        createProductDto = createSaveProductDto();
         updateProductDto = createUpdateProductDto();
         responseProductDto = createResponseProductDto();
-        saveVendorDto = createSaveVendorDto();
+        createVendorDto = createSaveVendorDto();
         updateVendorDto = createUpdateVendorDto();
         responseVendorDto = createResponseVendorDto();
     }
 
     private static ProductEntity createProduct() {
         ProductEntity product = new ProductEntity();
-        product.setExternalId(productId);
         product.setName("Test Product");
         product.setType("Test Type");
         product.setManufacturer("Test Manufacturer");
         product.setDescription("Test Description");
         product.setPrice(BigDecimal.valueOf(100));
+        product.setArticle(PRODUCT_ARTICLE);
         return product;
     }
 
@@ -71,8 +70,8 @@ public abstract class AbstractInitialization {
         return vendor;
     }
 
-    private static SaveProductDto createSaveProductDto() {
-        SaveProductDto dto = new SaveProductDto();
+    private static CreateProductDto createSaveProductDto() {
+        CreateProductDto dto = new CreateProductDto();
         dto.setName("Test Product");
         dto.setDescription("Test Description");
         dto.setType("Test Type");
@@ -83,18 +82,18 @@ public abstract class AbstractInitialization {
 
     private static UpdateProductDto createUpdateProductDto() {
         UpdateProductDto dto = new UpdateProductDto();
-        dto.setId(productId);
         dto.setName("Updated Product Name");
         dto.setDescription("Updated Product Description");
         dto.setType("Updated Product Type");
         dto.setManufacturer("Updated Manufacturer");
         dto.setPrice(BigDecimal.valueOf(80));
+        dto.setArticle(PRODUCT_ARTICLE);
         return dto;
     }
 
     private static ResponseProductDto createResponseProductDto() {
         ResponseProductDto dto = new ResponseProductDto();
-        dto.setId(productId);
+        dto.setArticle(PRODUCT_ARTICLE);
         dto.setName("Test Product");
         dto.setDescription("Test Description");
         dto.setType("Test Type");
@@ -103,8 +102,8 @@ public abstract class AbstractInitialization {
         return dto;
     }
 
-    private static SaveVendorDto createSaveVendorDto() {
-        SaveVendorDto dto = new SaveVendorDto();
+    private static CreateVendorDto createSaveVendorDto() {
+        CreateVendorDto dto = new CreateVendorDto();
         dto.setName("Test Vendor Name");
         dto.setCountry("Test Country");
         return dto;

@@ -1,6 +1,6 @@
 package asset.spy.products.service.exception;
 
-import asset.spy.products.service.dto.ErrorResponseDto;
+import asset.spy.products.service.dto.http.ErrorResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

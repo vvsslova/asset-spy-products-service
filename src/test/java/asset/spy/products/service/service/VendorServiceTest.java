@@ -1,13 +1,11 @@
 package asset.spy.products.service.service;
 
 import asset.spy.products.service.AbstractInitialization;
-import asset.spy.products.service.dto.ResponseVendorDto;
+import asset.spy.products.service.dto.http.vendor.ResponseVendorDto;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.exception.EntityAlreadyExistsException;
 import asset.spy.products.service.mapper.VendorMapper;
-import asset.spy.products.service.repositories.VendorRepository;
-import asset.spy.products.service.services.SpecificationCreateService;
-import asset.spy.products.service.services.VendorService;
+import asset.spy.products.service.repository.VendorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,21 +53,21 @@ public class VendorServiceTest extends AbstractInitialization {
         when(vendorRepository.save(any())).thenReturn(vendor);
         when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
 
-        ResponseVendorDto result = vendorService.saveVendor(saveVendorDto);
+        ResponseVendorDto result = vendorService.saveVendor(createVendorDto);
 
         assertThat(result).isEqualTo(responseVendorDto);
-        verify(vendorMapper).toVendorEntity(saveVendorDto);
+        verify(vendorMapper).toVendorEntity(createVendorDto);
         verify(vendorRepository).save(vendor);
         verify(vendorMapper).toResponseVendorDto(vendor);
     }
 
     @Test
     void saveVendorIfVendorAlreadyExistsTest() {
-        when(vendorMapper.toVendorEntity(saveVendorDto)).thenReturn(vendor);
+        when(vendorMapper.toVendorEntity(createVendorDto)).thenReturn(vendor);
         when(vendorRepository.save(vendor)).thenThrow(new DataIntegrityViolationException("Duplicate vendor"));
 
-        assertThrows(EntityAlreadyExistsException.class, () -> vendorService.saveVendor(saveVendorDto));
-        verify(vendorMapper).toVendorEntity(saveVendorDto);
+        assertThrows(EntityAlreadyExistsException.class, () -> vendorService.saveVendor(createVendorDto));
+        verify(vendorMapper).toVendorEntity(createVendorDto);
         verify(vendorRepository).save(vendor);
         verify(vendorMapper, never()).toResponseVendorDto(vendor);
     }

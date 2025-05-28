@@ -1,12 +1,12 @@
-package asset.spy.products.service.services;
+package asset.spy.products.service.service;
 
-import asset.spy.products.service.dto.ResponseVendorDto;
-import asset.spy.products.service.dto.SaveVendorDto;
-import asset.spy.products.service.dto.UpdateVendorDto;
+import asset.spy.products.service.dto.http.vendor.ResponseVendorDto;
+import asset.spy.products.service.dto.http.vendor.CreateVendorDto;
+import asset.spy.products.service.dto.http.vendor.UpdateVendorDto;
 import asset.spy.products.service.entity.VendorEntity;
 import asset.spy.products.service.exception.EntityAlreadyExistsException;
 import asset.spy.products.service.mapper.VendorMapper;
-import asset.spy.products.service.repositories.VendorRepository;
+import asset.spy.products.service.repository.VendorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class VendorService {
     }
 
     @Transactional
-    public ResponseVendorDto saveVendor(SaveVendorDto vendor) {
+    public ResponseVendorDto saveVendor(CreateVendorDto vendor) {
         log.info("Received vendor to save : {}", vendor);
 
         try {

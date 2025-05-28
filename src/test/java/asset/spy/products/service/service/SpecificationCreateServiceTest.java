@@ -3,7 +3,6 @@ package asset.spy.products.service.service;
 import asset.spy.products.service.AbstractInitialization;
 import asset.spy.products.service.entity.ProductEntity;
 import asset.spy.products.service.entity.VendorEntity;
-import asset.spy.products.service.services.SpecificationCreateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.jpa.domain.Specification;
 
