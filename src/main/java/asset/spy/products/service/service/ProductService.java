@@ -17,6 +17,10 @@ import asset.spy.products.service.repository.ProductItemStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,6 +37,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
+@CacheConfig(cacheNames = "product")
 public class ProductService {
     private final ProductRepository productRepository;
     private final VendorService vendorService;
@@ -58,6 +63,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(key = "#article")
     public ResponseProductDto getProduct(Long article) {
         log.info("Start getting product with article {}", article);
 
@@ -67,6 +73,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CachePut(key = "#result.article")
     public ResponseProductDto saveProduct(CreateProductDto product, UUID vendorId) {
         log.info("Received product to save : {}", product);
 
@@ -81,6 +88,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CachePut(key = "#productDto.article")
     public ResponseProductDto updateProduct(UpdateProductDto productDto) {
         log.info("Received product to update : {}", productDto);
 
@@ -93,6 +101,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CacheEvict(key = "#article")
     public ResponseProductDto deleteProduct(Long article) {
         log.info("Received article to delete : {}", article);
 
