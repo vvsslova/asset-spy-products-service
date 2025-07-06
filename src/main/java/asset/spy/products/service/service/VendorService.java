@@ -10,6 +10,10 @@ import asset.spy.products.service.repository.VendorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +27,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 @Slf4j
+@CacheConfig(cacheNames = "vendor")
 public class VendorService {
     private final VendorRepository vendorRepository;
     private final VendorMapper vendorMapper;
@@ -41,6 +46,7 @@ public class VendorService {
                 .map(vendorMapper::toResponseVendorDto);
     }
 
+    @Cacheable(key = "#id")
     @Transactional(readOnly = true)
     public ResponseVendorDto getVendorById(UUID id) {
         log.info("Start getting vendor with id {}", id);
@@ -50,6 +56,7 @@ public class VendorService {
         return vendorMapper.toResponseVendorDto(vendor);
     }
 
+    @CachePut(key = "#vendor.name")
     @Transactional
     public ResponseVendorDto saveVendor(CreateVendorDto vendor) {
         log.info("Received vendor to save : {}", vendor);
@@ -65,6 +72,7 @@ public class VendorService {
         }
     }
 
+    @CachePut(key = "#vendorDto.id")
     @Transactional
     public ResponseVendorDto updateVendor(UpdateVendorDto vendorDto) {
         log.info("Received vendor to update : {}", vendorDto);
@@ -77,6 +85,7 @@ public class VendorService {
         return vendorMapper.toResponseVendorDto(vendor);
     }
 
+    @CacheEvict(key = "#id")
     @Transactional
     public ResponseVendorDto deleteVendor(UUID id) {
         log.info("Received id to delete : {}", id);

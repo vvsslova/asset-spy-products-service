@@ -19,15 +19,23 @@ spring:
   liquibase:
     enabled: true
     default-schema: asset_spy_products_service_db
+  cache:
+    type: redis
+    redis:
+      time-to-live: 10m
+  data:
+    redis:
+      port: 6380
+      host: localhost
 jwt:
   secret-key: co7IB8BVZ2ZCWoyjnKbrX4ByykVOvY38vtv2DNK9kN4=
 kafka:
   count-partitions: 3
   vendor-topic-prefix: 'topic_vendor_'
-  bootstrap-servers: localhost:9092
+  bootstrap-servers: localhost:9094
   listener-prefix: 'kafkaListenerId-'
   concurrency: 3
   consumer-properties:
-    "[bootstrap.servers]": localhost:9092
+    "[bootstrap.servers]": localhost:9094
     "[group.id]": asset-spy-products-service
     "[auto.offset.reset]": earliest
