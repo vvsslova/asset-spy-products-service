@@ -1,6 +1,7 @@
 package asset.spy.products.service.kafka.config;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,5 +28,11 @@ public class KafkaConfig {
     @Bean
     public KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry() {
         return new KafkaListenerEndpointRegistry();
+    }
+
+    @Bean
+    public AdminClient adminClient(KafkaAdmin kafkaAdmin) {
+        Map<String, Object> configs = kafkaAdmin.getConfigurationProperties();
+        return AdminClient.create(configs);
     }
 }
