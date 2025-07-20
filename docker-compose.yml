@@ -1,0 +1,22 @@
+services:
+  products-service:
+    build:
+      dockerfile: Dockerfile
+    container_name: products-service
+    ports:
+      - "8081:8081"
+    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/asset_spy_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker:9092
+      KAFKA_CONSUMER_PROPERTIES_BOOTSTRAP_SERVERS: kafka-broker:9092
+    networks:
+      - asset-spy-network
+
+networks:
+  asset-spy-network:
+    name: asset-spy-network

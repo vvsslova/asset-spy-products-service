@@ -4,9 +4,9 @@ spring:
   application:
     name: asset-spy-products-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/asset_spy_db
-    username: postgres
-    password: 123
+    url:  ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/asset_spy_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:123}
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
@@ -25,17 +25,17 @@ spring:
       time-to-live: 10m
   data:
     redis:
-      port: 6380
-      host: localhost
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
 jwt:
   secret-key: co7IB8BVZ2ZCWoyjnKbrX4ByykVOvY38vtv2DNK9kN4=
 kafka:
   count-partitions: 3
   vendor-topic-prefix: 'topic_vendor_'
-  bootstrap-servers: localhost:9094
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
   listener-prefix: 'kafkaListenerId-'
   concurrency: 3
   consumer-properties:
-    "[bootstrap.servers]": localhost:9094
+    "[bootstrap.servers]": ${KAFKA_CONSUMER_PROPERTIES_BOOTSTRAP_SERVERS:localhost:9094}
     "[group.id]": asset-spy-products-service
     "[auto.offset.reset]": earliest
