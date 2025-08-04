@@ -102,14 +102,13 @@ public class ProductService {
 
     @Transactional
     @CacheEvict(key = "#article")
-    public ResponseProductDto deleteProduct(Long article) {
+    public void deleteProduct(Long article) {
         log.info("Received article to delete : {}", article);
 
         ProductEntity product = findProductByArticle(article);
 
         productRepository.delete(product);
         log.info("Product with article {} was deleted", article);
-        return productMapper.toResponseProductDto(product);
     }
 
     @Transactional(readOnly = true)

@@ -103,15 +103,12 @@ public class VendorServiceTest extends AbstractInitialization {
     @Test
     void deleteVendorIfVendorExistsTest() {
         when(vendorRepository.findByExternalId(vendorId)).thenReturn(Optional.of(vendor));
-        when(vendorMapper.toResponseVendorDto(vendor)).thenReturn(responseVendorDto);
         doNothing().when(vendorRepository).delete(vendor);
 
-        ResponseVendorDto result = vendorService.deleteVendor(vendorId);
+        vendorService.deleteVendor(vendorId);
 
-        assertThat(result).isEqualTo(responseVendorDto);
         verify(vendorRepository).findByExternalId(vendorId);
         verify(vendorRepository).delete(vendor);
-        verify(vendorMapper).toResponseVendorDto(vendor);
     }
 
     @Test
