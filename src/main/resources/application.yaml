@@ -28,7 +28,7 @@ spring:
       port: ${SPRING_DATA_REDIS_PORT:6379}
       host: ${SPRING_DATA_REDIS_HOST:localhost}
 jwt:
-  secret-key: co7IB8BVZ2ZCWoyjnKbrX4ByykVOvY38vtv2DNK9kN4=
+  secret-key: ${JWT_SECRET_KEY:co7IB8BVZ2ZCWoyjnKbrX4ByykVOvY38vtv2DNK9kN4=}
 kafka:
   count-partitions: 3
   vendor-topic-prefix: 'topic_vendor_'

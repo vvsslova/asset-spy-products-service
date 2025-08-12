@@ -103,7 +103,7 @@ public class VendorService {
 
     @CacheEvict(key = "#id")
     @Transactional
-    public ResponseVendorDto deleteVendor(UUID id) {
+    public void deleteVendor(UUID id) {
         log.info("Received id to delete : {}", id);
 
         VendorEntity vendor = findVendorById(id);
@@ -114,8 +114,6 @@ public class VendorService {
         log.info("Publishing DeletedVendorEvent for updating topics list because deleted vendor with name {}",
                 vendor.getName());
         applicationEventPublisher.publishEvent(new DeletedVendorEvent(vendor.getName()));
-
-        return vendorMapper.toResponseVendorDto(vendor);
     }
 
     public VendorEntity findVendorById(UUID id) {
