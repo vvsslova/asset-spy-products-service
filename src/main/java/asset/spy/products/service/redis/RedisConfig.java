@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -28,15 +29,23 @@ public class RedisConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory,
                                           RedisSerializer<ResponseVendorDto> vendorSerializer,
-                                          RedisSerializer<ResponseProductDto> productSerializer) {
+                                          RedisSerializer<ResponseProductDto> productSerializer,
+                                          ObjectMapper objectMapper) {
 
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
         cacheConfigurations.put("vendorConfig", createTypeCacheConfig(vendorSerializer, defaultKeyTimeToLive));
         cacheConfigurations.put("productConfig", createTypeCacheConfig(productSerializer, defaultKeyTimeToLive));
 
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration
+                .defaultCacheConfig()
+                .serializeValuesWith(RedisSerializationContext
+                        .SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)))
+                .entryTtl(defaultKeyTimeToLive)
+                .disableCachingNullValues();
+
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig())
+                .cacheDefaults(defaultConfig)
                 .withInitialCacheConfigurations(cacheConfigurations)
                 .build();
     }
