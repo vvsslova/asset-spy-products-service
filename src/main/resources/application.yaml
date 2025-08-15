@@ -2,6 +2,7 @@ server:
   port: 8081
   servlet:
     context-path: /product-service
+  forward-headers-strategy: framework
 spring:
   application:
     name: asset-spy-products-service
